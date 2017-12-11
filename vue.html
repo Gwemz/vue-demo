@@ -13,6 +13,29 @@
         width: 1200px;
         margin: 0 auto;
     }
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
+        opacity: 0
+    }
+    .bounce-enter-active {
+        animation: bounce-in .5s;
+    }
+    .bounce-leave-active {
+        animation: bounce-in .5s reverse;
+    }
+    @keyframes bounce-in {
+        0% {
+            transform: scale(0);
+        }
+        50% {
+            transform: scale(1.5);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
 </style>
 <body>
 <div class="container">
@@ -566,6 +589,67 @@
             el: '#example-bangding',
             data: {
                 checkedNames: []
+            }
+        })
+    </script>
+    <div id="example-zujian">
+        <my-component></my-component>
+    </div>
+    <script>
+        // 注册
+        Vue.component('my-component', {
+            template: '<div>A custom component!</div>'
+        })
+
+        // 创建根实例
+        new Vue({
+            el: '#example-zujian'
+        })
+    </script>
+    <div id="example-zujian2">
+        <my-component></my-component>
+    </div>
+    <script>
+        var Child = {
+            template: '<div>A custom component!</div>'
+        }
+
+        new Vue({
+            el:'#example-zujian2',
+            components: {
+                // <my-component> 将只在父组件模板中可用
+                'my-component': Child
+            }
+        })
+    </script>
+    <h2>单元素/组件的过渡</h2>
+    <div id="demo-animate">
+        <button v-on:click="show = !show">
+            Toggle
+        </button>
+        <transition name="fade">
+            <p v-if="show">hello</p>
+        </transition>
+    </div>
+    <script>
+        new Vue({
+            el: '#demo-animate',
+            data: {
+                show: true
+            }
+        })
+    </script>
+    <div id="demo-animate2">
+        <button @click="show = !show">Toggle show</button>
+        <transition name="bounce">
+            <p v-if="show">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis enim libero, at lacinia diam fermentum id. Pellentesque habitant morbi tristique senectus et netus.</p>
+        </transition>
+    </div>
+    <script>
+        new Vue({
+            el: '#demo-animate2',
+            data: {
+                show: true
             }
         })
     </script>
