@@ -3,348 +3,573 @@
 <head>
     <meta charset="UTF-8">
     <title>vue-demo</title>
-    <link rel="icon" type="image/png" href="https://cn.vuejs.org//images/logo.png">
+    <link rel="icon"
+          type="image/png"
+          href="https://cn.vuejs.org//images/logo.png">
     <script src="https://unpkg.com/vue"></script>
 </head>
 <style>
-    .container{width:1200px;margin:0 auto;}
+    .container {
+        width: 1200px;
+        margin: 0 auto;
+    }
 </style>
 <body>
-    <div class="container">
-        <div id="app">
-            {{ message }}
-        </div>
-        <div id="app-2">
+<div class="container">
+    <div id="app">
+        {{ message }}
+    </div>
+    <div id="app-2">
       <span v-bind:title="message">
         鼠标悬停几秒钟查看此处动态绑定的提示信息！
       </span>
-        </div>
-        <div id="app-3">
-            <p v-if="seen">现在你看到我了</p>
-        </div>
-        <div id="app-4">
-            <ol>
-                <li v-for="todo in todos">
-                    {{ todo.text }}
-                </li>
-            </ol>
-        </div>
-        <div id="app-5">
-            <p>{{ message }}</p>
-            <button v-on:click="reverseMessage">逆转消息</button>
-        </div>
-        <div id="app-6">
-            <p>{{ message }}</p>
-            <input v-model="message">
-        </div>
-        <div id="app-7">
-            <ol>
-                <!--
-                  现在我们为每个 todo-item 提供 todo 对象
-                  todo 对象是变量，即其内容可以是动态的。
-                  我们也需要为每个组件提供一个“key”，晚些时候我们会做个解释。
-                -->
-                <todo-item
-                        v-for="item in groceryList"
-                        v-bind:todo="item"
-                        v-bind:key="item.id">
-                </todo-item>
-            </ol>
-        </div>
-        <div id="app-8">
-            <app-nav></app-nav>
-            <app-view>
-                <app-sidebar></app-sidebar>
-                <app-content></app-content>
-            </app-view>
-        </div>
-        <div id="example"></div>
-        <div id="example1">
-            <p>Using mustaches: {{ rawHtml }}</p>
-            <p>Using v-html directive: <span v-html="rawHtml"></span></p>
-        </div>
-        <script>
-            new Vue({
-                el: '#example1',
-                data: function () {
-                    return {
-                        rawHtml: '<span style="color: red">This should be red.</span>'
-                    }
-                }
-            })
-        </script>
-        <button v-bind:disabled="false">Button</button>
-        <div id="example2">
-            <p>Original message: "{{ message }}"</p>
-            <p>Computed reversed message: "{{ reversedMessage }}"</p>
-        </div>
-        <script>
-            var vm = new Vue({
-                el: '#example2',
-                data: {
-                    message: 'Hello'
-                },
-                computed: {
-                    // 计算属性的 getter
-                    reversedMessage: function () {
-                        // `this` 指向 vm 实例
-                        return this.message.split('').reverse().join('')
-                    }
-                }
-            })
-            console.log(vm.reversedMessage)
-            vm.message = 'Goodbye'
-            console.log(vm.reversedMessage)
-        </script>
-        <div id="demo">{{ fullName }}</div>
-        <script>
-            var vm = new Vue({
-                el: '#demo',
-                data: {
-                    firstName: 'Foo',
-                    lastName: 'Bar',
-                    fullName: 'Foo Bar'
-                },
-                watch: {
-                    firstName: function (val) {
-                        this.fullName = val + ' ' + this.lastName
-                    },
-                    lastName: function (val) {
-                        this.fullName = this.firstName + ' ' + val
-                    }
-                }
-            })
-        </script>
-        <div id="watch-example">
-            <p>
-                Ask a yes/no question:
-                <input v-model="question">
-            </p>
-            <p>{{ answer }}</p>
-        </div>
-        <!-- 因为 AJAX 库和通用工具的生态已经相当丰富，Vue 核心代码没有重复 -->
-        <!-- 提供这些功能以保持精简。这也可以让你自由选择自己更熟悉的工具。 -->
-        <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
-        <script>
-            var watchExampleVM = new Vue({
-                el: '#watch-example',
-                data: {
-                    question: '',
-                    answer: 'I cannot give you an answer until you ask a question!'
-                },
-                watch: {
-                    // 如果 `question` 发生改变，这个函数就会运行
-                    question: function (newQuestion) {
-                        this.answer = 'Waiting for you to stop typing...'
-                        this.getAnswer()
-                    }
-                },
-                methods: {
-                    // `_.debounce` 是一个通过 Lodash 限制操作频率的函数。
-                    // 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率
-                    // AJAX 请求直到用户输入完毕才会发出。想要了解更多关于
-                    // `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，
-                    // 请参考：https://lodash.com/docs#debounce
-                    getAnswer: _.debounce(
-                        function () {
-                            if (this.question.indexOf('?') === -1) {
-                                this.answer = 'Questions usually contain a question mark. ;-)'
-                                return
-                            }
-                            this.answer = 'Thinking...'
-                            var vm = this
-                            axios.get('https://yesno.wtf/api')
-                                .then(function (response) {
-                                    vm.answer = _.capitalize(response.data.answer)
-                                })
-                                .catch(function (error) {
-                                    vm.answer = 'Error! Could not reach the API. ' + error
-                                })
-                        },
-                        // 这是我们为判定用户停止输入等待的毫秒数
-                        500
-                    )
-                }
-            })
-        </script>
-
-        <div class="static"
-             v-bind:class="{ active: isActive, 'text-danger': hasError }" v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }">
-            class绑定
-        </div>
-        <script>
-            new Vue({
-                el:'.static',
-                data:{
-                    isActive: false,
-                    hasError: true,
-                    activeColor: 'red',
-                    fontSize: 30
-                }
-            })
-        </script>
-        <div class="static1" v-bind:class="classObject">class绑定1</div>
-        <script>
-            new Vue({
-                el:'.static1',
-                data:{
-                    classObject:{
-                        'active':true,
-                        'text-danger':false
-                    }
-                }
-            })
-        </script>
-        <my-component class="baz boo"></my-component>
-        <script>
-            Vue.component('my-component', {
-                template: '<p class="foo bar">Hi</p>'
-            })
-        </script>
-        <div id="tiaojian">
-            <template v-if="ok">
-                <h1>Title</h1>
-                <p>Paragraph 1</p>
-                <p>Paragraph 2</p>
-            </template>
-        </div>
-        <script>
-            new Vue({
-                el:'#tiaojian',
-                data:{
-                    'ok':true
-                }
-            })
-        </script>
-        <div v-if="Math.random() > 0.5">
-            Now you see me
-        </div>
-        <div v-else>
-            Now you don't
-        </div>
-
-        <div v-if="type === 'A'">
-            A
-        </div>
-        <div v-else-if="type === 'B'">
-            B
-        </div>
-        <div v-else-if="type === 'C'">
-            C
-        </div>
-        <div v-else>
-            Not A/B/C
-        </div>
-
-        <div id="no-key-example" class="demo">
-            <template v-if="loginType === 'username'">
-                <label>Username</label>
-                <input placeholder="Enter your username">
-            </template>
-            <template v-else>
-                <label>Email</label>
-                <input placeholder="Enter your email address">
-            </template>
-        </div>
-        <script>
-            new Vue({
-                el: '#no-key-example',
-                data: {
-                    loginType: 'username'
-                },
-                methods: {
-                    toggleLoginType: function () {
-                        return this.loginType = this.loginType === 'username' ? 'email' : 'username'
-                    }
-                }
-            })
-        </script>
-        <h1 v-show='ok' id="show">Hello!</h1>
-        <script>
-            new Vue({
-                el:'#show',
-                data:{
-                    'ok':true
-                }
-            })
-        </script>
-        <ul id="example-1">
-            <li v-for="item in items">
-                {{ item.message }}
-            </li>
-        </ul>
-        <script>
-            var example1 = new Vue({
-                el: '#example-1',
-                data: {
-                    items: [
-                        { message: 'Foo' },
-                        { message: 'Bar' }
-                    ]
-                }
-            })
-        </script>
-        <ul id="example-2">
-            <li v-for="(item, index) in items">
-                {{ parentMessage }} - {{ index }} - {{ item.message }}
-            </li>
-        </ul>
-        <script>
-            var example2 = new Vue({
-                el: '#example-2',
-                data: {
-                    parentMessage: 'Parent',
-                    items: [
-                        { message: 'Foo' },
-                        { message: 'Bar' }
-                    ]
-                }
-            })
-        </script>
-        <ul id="v-for-object" class="demo">
-            <li v-for="(value,key,index) in object">
-                {{index}}. {{key}} : {{ value }}
-            </li>
-        </ul>
-        <script>
-            new Vue({
-                el: '#v-for-object',
-                data: {
-                    object: {
-                        firstName: 'winter',
-                        lastName: 'Guo',
-                        age: 30
-                    }
-                }
-            })
-        </script>
-        <h2>常用方法</h2>
-        <ul id="fangfa">
-            <li v-for="item in items">
-                {{item.message}}
-            </li>
-        </ul>
-        <script>
-            var example1 = new Vue({
-                el: '#fangfa',
-                data: {
-                    items: [
-                        { message: 'push()' },
-                        { message: 'pop()' },
-                        { message: 'shift()' },
-                        { message: 'unshift()' },
-                        { message: 'splice()' },
-                        { message: 'sort()' },
-                        { message: 'reverse()' },
-                        { message: 'filter()' },
-                        { message: 'concat()' },
-                        { message: 'slice()' }
-                    ]
-                }
-            })
-        </script>
     </div>
+    <div id="app-3">
+        <p v-if="seen">现在你看到我了</p>
+    </div>
+    <div id="app-4">
+        <ol>
+            <li v-for="todo in todos">
+                {{ todo.text }}
+            </li>
+        </ol>
+    </div>
+    <div id="app-5">
+        <p>{{ message }}</p>
+        <button v-on:click="reverseMessage">逆转消息</button>
+    </div>
+    <div id="app-6">
+        <p>{{ message }}</p>
+        <input v-model="message">
+    </div>
+    <div id="app-7">
+        <ol>
+            <!--
+              现在我们为每个 todo-item 提供 todo 对象
+              todo 对象是变量，即其内容可以是动态的。
+              我们也需要为每个组件提供一个“key”，晚些时候我们会做个解释。
+            -->
+            <todo-item
+                    v-for="item in groceryList"
+                    v-bind:todo="item"
+                    v-bind:key="item.id">
+            </todo-item>
+        </ol>
+    </div>
+    <div id="app-8">
+        <app-nav></app-nav>
+        <app-view>
+            <app-sidebar></app-sidebar>
+            <app-content></app-content>
+        </app-view>
+    </div>
+    <div id="example"></div>
+    <div id="example1">
+        <p>Using mustaches: {{ rawHtml }}</p>
+        <p>Using v-html directive: <span v-html="rawHtml"></span></p>
+    </div>
+    <script>
+        new Vue({
+            el: '#example1',
+            data: function () {
+                return {
+                    rawHtml: '<span style="color: red">This should be red.</span>'
+                }
+            }
+        })
+    </script>
+    <button v-bind:disabled="false">Button</button>
+    <div id="example2">
+        <p>Original message: "{{ message }}"</p>
+        <p>Computed reversed message: "{{ reversedMessage }}"</p>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: '#example2',
+            data: {
+                message: 'Hello'
+            },
+            computed: {
+                // 计算属性的 getter
+                reversedMessage: function () {
+                    // `this` 指向 vm 实例
+                    return this.message.split('').reverse().join('')
+                }
+            }
+        })
+        console.log(vm.reversedMessage)
+        vm.message = 'Goodbye'
+        console.log(vm.reversedMessage)
+    </script>
+    <div id="demo">{{ fullName }}</div>
+    <script>
+        var vm = new Vue({
+            el: '#demo',
+            data: {
+                firstName: 'Foo',
+                lastName: 'Bar',
+                fullName: 'Foo Bar'
+            },
+            watch: {
+                firstName: function (val) {
+                    this.fullName = val + ' ' + this.lastName
+                },
+                lastName: function (val) {
+                    this.fullName = this.firstName + ' ' + val
+                }
+            }
+        })
+    </script>
+    <div id="watch-example">
+        <p>
+            Ask a yes/no question:
+            <input v-model="question">
+        </p>
+        <p>{{ answer }}</p>
+    </div>
+    <!-- 因为 AJAX 库和通用工具的生态已经相当丰富，Vue 核心代码没有重复 -->
+    <!-- 提供这些功能以保持精简。这也可以让你自由选择自己更熟悉的工具。 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+    <script>
+        var watchExampleVM = new Vue({
+            el: '#watch-example',
+            data: {
+                question: '',
+                answer: 'I cannot give you an answer until you ask a question!'
+            },
+            watch: {
+                // 如果 `question` 发生改变，这个函数就会运行
+                question: function (newQuestion) {
+                    this.answer = 'Waiting for you to stop typing...'
+                    this.getAnswer()
+                }
+            },
+            methods: {
+                // `_.debounce` 是一个通过 Lodash 限制操作频率的函数。
+                // 在这个例子中，我们希望限制访问 yesno.wtf/api 的频率
+                // AJAX 请求直到用户输入完毕才会发出。想要了解更多关于
+                // `_.debounce` 函数 (及其近亲 `_.throttle`) 的知识，
+                // 请参考：https://lodash.com/docs#debounce
+                getAnswer: _.debounce(
+                    function () {
+                        if (this.question.indexOf('?') === -1) {
+                            this.answer = 'Questions usually contain a question mark. ;-)'
+                            return
+                        }
+                        this.answer = 'Thinking...'
+                        var vm = this
+                        axios.get('https://yesno.wtf/api')
+                            .then(function (response) {
+                                vm.answer = _.capitalize(response.data.answer)
+                            })
+                            .catch(function (error) {
+                                vm.answer = 'Error! Could not reach the API. ' + error
+                            })
+                    },
+                    // 这是我们为判定用户停止输入等待的毫秒数
+                    500
+                )
+            }
+        })
+    </script>
+
+    <div class="static"
+         v-bind:class="{ active: isActive, 'text-danger': hasError }"
+         v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }">
+        class绑定
+    </div>
+    <script>
+        new Vue({
+            el: '.static',
+            data: {
+                isActive: false,
+                hasError: true,
+                activeColor: 'red',
+                fontSize: 30
+            }
+        })
+    </script>
+    <div class="static1"
+         v-bind:class="classObject">class绑定1
+    </div>
+    <script>
+        new Vue({
+            el: '.static1',
+            data: {
+                classObject: {
+                    'active': true,
+                    'text-danger': false
+                }
+            }
+        })
+    </script>
+    <my-component class="baz boo"></my-component>
+    <script>
+        Vue.component('my-component', {
+            template: '<p class="foo bar">Hi</p>'
+        })
+    </script>
+    <div id="tiaojian">
+        <template v-if="ok">
+            <h1>Title</h1>
+            <p>Paragraph 1</p>
+            <p>Paragraph 2</p>
+        </template>
+    </div>
+    <script>
+        new Vue({
+            el: '#tiaojian',
+            data: {
+                'ok': true
+            }
+        })
+    </script>
+    <div v-if="Math.random() > 0.5">
+        Now you see me
+    </div>
+    <div v-else>
+        Now you don't
+    </div>
+
+    <div v-if="type === 'A'">
+        A
+    </div>
+    <div v-else-if="type === 'B'">
+        B
+    </div>
+    <div v-else-if="type === 'C'">
+        C
+    </div>
+    <div v-else>
+        Not A/B/C
+    </div>
+
+    <div id="no-key-example"
+         class="demo">
+        <template v-if="loginType === 'username'">
+            <label>Username</label>
+            <input placeholder="Enter your username">
+        </template>
+        <template v-else>
+            <label>Email</label>
+            <input placeholder="Enter your email address">
+        </template>
+    </div>
+    <script>
+        new Vue({
+            el: '#no-key-example',
+            data: {
+                loginType: 'username'
+            },
+            methods: {
+                toggleLoginType: function () {
+                    return this.loginType = this.loginType === 'username' ? 'email' : 'username'
+                }
+            }
+        })
+    </script>
+    <h1 v-show='ok'
+        id="show">Hello!</h1>
+    <script>
+        new Vue({
+            el: '#show',
+            data: {
+                'ok': true
+            }
+        })
+    </script>
+    <ul id="example-1">
+        <li v-for="item in items">
+            {{ item.message }}
+        </li>
+    </ul>
+    <script>
+        var example1 = new Vue({
+            el: '#example-1',
+            data: {
+                items: [
+                    {message: 'Foo'},
+                    {message: 'Bar'}
+                ]
+            }
+        })
+    </script>
+    <ul id="example-2">
+        <li v-for="(item, index) in items">
+            {{ parentMessage }} - {{ index }} - {{ item.message }}
+        </li>
+    </ul>
+    <script>
+        var example2 = new Vue({
+            el: '#example-2',
+            data: {
+                parentMessage: 'Parent',
+                items: [
+                    {message: 'Foo'},
+                    {message: 'Bar'}
+                ]
+            }
+        })
+    </script>
+    <ul id="v-for-object"
+        class="demo">
+        <li v-for="(value,key,index) in object">
+            {{index}}. {{key}} : {{ value }}
+        </li>
+    </ul>
+    <script>
+        new Vue({
+            el: '#v-for-object',
+            data: {
+                object: {
+                    firstName: 'winter',
+                    lastName: 'Guo',
+                    age: 30
+                }
+            }
+        })
+    </script>
+    <h2>常用方法</h2>
+    <ul id="fangfa">
+        <li v-for="item in items">
+            {{item.message}}
+        </li>
+    </ul>
+    <script>
+        var example1 = new Vue({
+            el: '#fangfa',
+            data: {
+                items: [
+                    {message: 'push()'},
+                    {message: 'pop()'},
+                    {message: 'shift()'},
+                    {message: 'unshift()'},
+                    {message: 'splice()'},
+                    {message: 'sort()'},
+                    {message: 'reverse()'},
+                    {message: 'filter()'},
+                    {message: 'concat()'},
+                    {message: 'slice()'}
+                ]
+            }
+        })
+
+
+    </script>
+    <ul id="dataSet">
+        <li v-for="(item,key) in userProfile">{{key}} : {{item}}</li>
+    </ul>
+    <script>
+        var vm = new Vue({
+            el: '#dataSet',
+            data: {
+                userProfile: {
+                    name: 'Anika'
+                }
+            }
+        })
+        vm.$set(vm.userProfile, 'age', 27)
+    </script>
+    <ul id="dataTest">
+        <!--<li v-for="n in evenNumbers">{{n}}</li>-->
+        <li v-for="n in even(evenNumbers)">{{n}}</li>
+    </ul>
+    <script>
+        new Vue({
+            el: '#dataTest',
+            data: {
+                numbers: [1, 2, 3, 4, 5]
+            },
+            computed: {
+                evenNumbers: function () {
+                    return this.numbers.filter(function (number) {
+                        return number % 2 === 0
+                    })
+                }
+            },
+            methods: {
+                even: function (numbers) {
+                    return numbers.filter(function (number) {
+                        return number % 2 === 0
+                    })
+                }
+            }
+        })
+    </script>
+    <div id="range">
+        <span v-for="n in 10">{{ n }} </span>
+    </div>
+    <script>
+        new Vue({el: '#range'})
+    </script>
+    <div id="todo-list-example">
+        <input
+                v-model="newTodoText"
+                v-on:keyup.enter="addNewTodo"
+                placeholder="Add a todo"
+        >
+        <ul>
+            <li
+                    is="todo-item"
+                    v-for="(todo, index) in todos"
+                    v-bind:key="todo.id"
+                    v-bind:title="todo.title"
+                    v-on:remove="todos.splice(index, 1)"
+            ></li>
+        </ul>
+    </div>
+    <script>
+        Vue.component('todo-item', {
+            template: '\
+                <li>\
+                  {{ title }}\
+                  <button v-on:click="$emit(\'remove\')">X</button>\
+                </li>\
+            ',
+            props: ['title']
+        })
+
+        new Vue({
+            el: '#todo-list-example',
+            data: {
+                newTodoText: '',
+                todos: [
+                    {
+                        id: 1,
+                        title: 'Do the dishes',
+                    },
+                    {
+                        id: 2,
+                        title: 'Take out the trash',
+                    },
+                    {
+                        id: 3,
+                        title: 'Mow the lawn'
+                    }
+                ],
+                nextTodoId: 4
+            },
+            methods: {
+                addNewTodo: function () {
+                    this.todos.push({
+                        id: this.nextTodoId++,
+                        title: this.newTodoText
+                    })
+                    this.newTodoText = ''
+                }
+            }
+        })
+    </script>
+    <div id="example-click">
+        <button v-on:click="counter += 1">增加点击次数</button>
+        <p>The button above has been clicked {{ counter }} times.</p>
+    </div>
+    <div id="example-click2">
+        <!-- `greet` 是在下面定义的方法名 -->
+        <button v-on:click="greet">Greet</button>
+    </div>
+    <div id="example-click3">
+        <button v-on:click="say('hi')">Say hi</button>
+        <button v-on:click="say('what')">Say what</button>
+    </div>
+    <div id="example-click4">
+        <button v-on:click="warn('Form cannot be submitted yet.', $event)">
+            Submit
+        </button>
+    </div>
+    <script>
+        var example1 = new Vue({
+            el: '#example-click',
+            data: {
+                counter: 0
+            }
+        })
+        var example2 = new Vue({
+            el: '#example-click2',
+            data: {
+                name: 'winter Guo!'
+            },
+            // 在 `methods` 对象中定义方法
+            methods: {
+                greet: function (event) {
+                    // `this` 在方法里指向当前 Vue 实例
+                    alert('Hello ' + this.name + '!')
+                    // `event` 是原生 DOM 事件
+                    if (event) {
+                        alert(event.target.tagName)
+                    }
+                }
+            }
+        })
+        new Vue({
+            el: '#example-click3',
+            methods: {
+                say: function (message) {
+                    alert(message)
+                }
+            }
+        })
+        new Vue({
+            el: '#example-click4',
+            methods: {
+                warn: function (message, event) {
+                    // 现在我们可以访问原生事件对象
+                    if (event) event.preventDefault()
+                    alert(message)
+                }
+            }
+        })
+    </script>
+    <h2>事件绑定</h2>
+    <!-- 阻止单击事件继续传播 -->
+    <a v-on:click.stop="doThis"></a>
+
+    <!-- 提交事件不再重载页面 -->
+    <form v-on:submit.prevent="onSubmit"></form>
+
+    <!-- 修饰符可以串联 -->
+    <a v-on:click.stop.prevent="doThat"></a>
+
+    <!-- 只有修饰符 -->
+    <form v-on:submit.prevent></form>
+
+    <!-- 添加事件监听器时使用事件捕获模式 -->
+    <!-- 即内部元素触发的事件先在此处处理，然后才交由内部元素自身进行处理 -->
+    <div v-on:click.capture="doThis">...</div>
+
+    <!-- 只当在 event.target 是当前元素自身时触发处理函数 -->
+    <!-- 即事件不是从内部元素触发的 -->
+    <div v-on:click.self="doThat">...</div>
+    <!-- 点击事件将只会触发一次 -->
+    <a v-on:click.once="doThis"></a>
+    <!-- 只有在 `keyCode` 是 13 时调用 `vm.submit()` -->
+    <input v-on:keyup.13="submit">
+    <!-- 同上 -->
+    <input v-on:keyup.enter="submit">
+    <!-- 缩写语法 -->
+    <input @keyup.enter="submit">
+
+    <h3>---------------------------------</h3>
+    <div id='example-bangding'>
+        <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+        <label for="jack">Jack</label>
+        <input type="checkbox" id="john" value="John" v-model="checkedNames">
+        <label for="john">John</label>
+        <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+        <label for="mike">Mike</label>
+        <br>
+        <span>Checked names: {{ checkedNames }}</span>
+    </div>
+    <script>
+        new Vue({
+            el: '#example-bangding',
+            data: {
+                checkedNames: []
+            }
+        })
+    </script>
+</div>
 </body>
 <script>
     var app = new Vue({
@@ -369,9 +594,9 @@
         el: '#app-4',
         data: {
             todos: [
-                { text: '学习 JavaScript' },
-                { text: '学习 Vue' },
-                { text: '整个牛项目' }
+                {text: '学习 JavaScript'},
+                {text: '学习 Vue'},
+                {text: '整个牛项目'}
             ]
         }
     })
@@ -401,13 +626,13 @@
         el: '#app-7',
         data: {
             groceryList: [
-                { id: 0, text: '蔬菜' },
-                { id: 1, text: '奶酪' },
-                { id: 2, text: '随便其他什么人吃的东西' }
+                {id: 0, text: '蔬菜'},
+                {id: 1, text: '奶酪'},
+                {id: 2, text: '随便其他什么人吃的东西'}
             ]
         }
     })
-    var data = { a: 1 }
+    var data = {a: 1}
     var vm = new Vue({
         el: '#example',
         data: data
